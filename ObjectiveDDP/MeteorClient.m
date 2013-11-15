@@ -4,6 +4,9 @@
 #import "srp/srp.h"
 
 @interface MeteorClient ()
+{
+    NSMutableDictionary *_responseCallbacks;
+}
 
 @property (nonatomic, copy) NSString *password;
 @property (nonatomic, copy) NSString *userName;
@@ -20,18 +23,34 @@
         self.subscriptionsParameters = [NSMutableDictionary dictionary];
         self.methodIds = [NSMutableSet set];
         self.retryAttempts = 0;
+        _responseCallbacks = [NSMutableDictionary dictionary];
     }
     return self;
 }
 
+#pragma mark -
 #pragma mark MeteorClient public API
+#pragma mark -
 
-- (void)resetCollections {
-    [self.collections removeAllObjects];
-}
-
+#pragma mark Request/response
 - (void)sendWithMethodName:(NSString *)methodName parameters:(NSArray *)parameters {
     [self sendWithMethodName:methodName parameters:parameters notifyOnResponse:NO];
+}
+
+- (NSString*)sendWithMethodName:(NSString *)methodName parameters:(NSArray *)parameters responseCallback:(void(^)(NSDictionary *response, NSError *error))responseCallback
+{
+    if (!self.websocketReady && responseCallback) {
+        responseCallback(nil, [NSError errorWithDomain:MeteorClientTransportErrorDomain code:MeteorClientNotConnectedError userInfo:@{
+            NSLocalizedDescriptionKey: @"You are not connected",
+        }]);
+        return nil;
+    }
+    
+    NSString *identifier = [self sendWithMethodName:methodName parameters:parameters notifyOnResponse:YES];
+    
+    if(responseCallback && identifier)
+        _responseCallbacks[identifier] = [responseCallback copy];
+    return identifier;
 }
 
 -(NSString *)sendWithMethodName:(NSString *)methodName parameters:(NSArray *)parameters notifyOnResponse:(BOOL)notify {
@@ -47,6 +66,11 @@
                 parameters:parameters];
 
     return methodId;
+}
+
+#pragma mark Collections and subscriptions
+- (void)resetCollections {
+    [self.collections removeAllObjects];
 }
 
 - (void)addSubscription:(NSString *)subscriptionName {
@@ -77,6 +101,7 @@
     }
 }
 
+#pragma mark Login
 static BOOL userIsLoggingIn = NO;
 
 - (void)logonWithUsername:(NSString *)username password:(NSString *)password {
@@ -92,6 +117,10 @@ static BOOL userIsLoggingIn = NO;
 - (void)logout {
     [self sendWithMethodName:@"logout" parameters:nil];
 }
+
+#pragma mark -
+#pragma mark Implementation details
+#pragma mark -
 
 #pragma mark <ObjectiveDDPDelegate>
 
@@ -109,6 +138,20 @@ static int LOGON_RETRY_MAX = 5;
                                                                 object:self
                                                               userInfo:response];
             [self.methodIds removeObject:messageId];
+            
+            void(^responseCallback)(NSDictionary*, NSError*) = _responseCallbacks[messageId];
+            if(responseCallback) {
+                NSDictionary *errorDesc = message[@"error"];
+                NSError *error = !errorDesc ? nil : [NSError
+                    errorWithDomain:errorDesc[@"errorType"]
+                    code:[errorDesc[@"error"] intValue]
+                    userInfo:@{
+                        NSLocalizedDescriptionKey: errorDesc[@"message"],
+                    }
+                ];
+                responseCallback(response, error);
+                [_responseCallbacks removeObjectForKey:messageId];
+            }
         }
     } else if (msg && [msg isEqualToString:@"result"]
                && message[@"result"]
@@ -195,6 +238,7 @@ static int LOGON_RETRY_MAX = 5;
 - (void)didReceiveConnectionError:(NSError *)error {
     self.websocketReady = NO;
     self.connected = NO;
+    [self _invalidateOutstandingRequests];
     [[NSNotificationCenter defaultCenter] postNotificationName:MeteorClientDidDisconnectNotification object:self];
     [self performSelector:@selector(reconnect)
                withObject:self
@@ -204,10 +248,27 @@ static int LOGON_RETRY_MAX = 5;
 - (void)didReceiveConnectionClose {
     self.websocketReady = NO;
     self.connected = NO;
+    [self _invalidateOutstandingRequests];
     [[NSNotificationCenter defaultCenter] postNotificationName:MeteorClientDidDisconnectNotification object:self];
     [self performSelector:@selector(reconnect)
                withObject:self
                afterDelay:5.0];
+}
+
+- (void)_invalidateOutstandingRequests
+{
+    for(NSString *messageId in _responseCallbacks.keyEnumerator) {
+        void(^responseCallback)(NSDictionary*, NSError*) = _responseCallbacks[messageId];
+        responseCallback(nil, [NSError
+            errorWithDomain:MeteorClientTransportErrorDomain
+            code:MeteorClientDisconnectedError
+            userInfo:@{
+                NSLocalizedDescriptionKey: @"You were disconnected",
+            }
+        ]);
+    }
+    [_responseCallbacks removeAllObjects];
+    [self.methodIds removeAllObjects];
 }
 
 #pragma mark Meteor Data Managment
@@ -310,3 +371,5 @@ static SRPUser *srpUser;
 
 NSString *const MeteorClientDidConnectNotification = @"boundsj.objectiveddp.connected";
 NSString *const MeteorClientDidDisconnectNotification = @"boundsj.objectiveddp.disconnected";
+
+extern NSString *const MeteorClientTransportErrorDomain = @"boundsj.objectiveddp.transport";
