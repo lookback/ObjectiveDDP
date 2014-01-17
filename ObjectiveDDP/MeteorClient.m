@@ -1,6 +1,7 @@
 #import "DependencyProvider.h"
 #import "MeteorClient.h"
 #import "BSONIdGenerator.h"
+#import "NSData+DDPHex.h"
 #import "srp/srp.h"
 
 @interface MeteorClient ()
@@ -116,6 +117,40 @@ static BOOL userIsLoggingIn = NO;
 
 - (void)logout {
     [self sendWithMethodName:@"logout" parameters:nil];
+}
+
+- (void)signupWithUsername:(NSString *)username password:(NSString *)password fullname:(NSString*)fullname
+{
+	userIsLoggingIn = YES;
+	NSData *pass = [password dataUsingEncoding:NSUTF8StringEncoding];
+	
+	const unsigned char *bytes_s, *bytes_v;
+	int len_s, len_v;
+	srp_create_salted_verification_key(SRP_SHA256, SRP_NG_1024, [username UTF8String], pass.bytes, pass.length, &bytes_s, &len_s, &bytes_v, &len_v, NULL, NULL);
+	NSString *identity = [[NSUUID UUID] UUIDString];
+	NSString *salt = [[NSData dataWithBytesNoCopy:(void*)bytes_s length:len_s freeWhenDone:YES] ddp_toHex];
+	NSString *verifier = [[NSData dataWithBytesNoCopy:(void*)bytes_v length:len_v freeWhenDone:YES] ddp_toHex];
+	
+	[self sendWithMethodName:@"createUser" parameters:@[@{
+		@"email": username,
+		@"profile": @{
+			@"fullname": fullname,
+			@"signupToken": @"",
+		},
+		@"srp": @{
+			@"identity": identity,
+			@"salt": salt,
+			@"verifier": verifier,
+		}
+	}] responseCallback:^(NSDictionary *response, NSError *error) {
+		self.sessionToken = response[@"token"];
+		userIsLoggingIn = NO;
+		if(error) {
+			[self.authDelegate authenticationFailed:error.localizedDescription];
+		} else {
+			[self.authDelegate authenticationWasSuccessful];
+		}
+	}];
 }
 
 #pragma mark -
@@ -372,4 +407,4 @@ static SRPUser *srpUser;
 NSString *const MeteorClientDidConnectNotification = @"boundsj.objectiveddp.connected";
 NSString *const MeteorClientDidDisconnectNotification = @"boundsj.objectiveddp.disconnected";
 
-extern NSString *const MeteorClientTransportErrorDomain = @"boundsj.objectiveddp.transport";
+NSString *const MeteorClientTransportErrorDomain = @"boundsj.objectiveddp.transport";

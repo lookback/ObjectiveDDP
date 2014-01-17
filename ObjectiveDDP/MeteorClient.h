@@ -37,6 +37,7 @@
 
 #pragma mark Login
 - (void)logonWithUsername:(NSString *)username password:(NSString *)password;
+- (void)signupWithUsername:(NSString *)username password:(NSString *)password fullname:(NSString*)fullname;
 - (void)logout;
 
 @end

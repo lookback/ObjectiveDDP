@@ -299,7 +299,7 @@ static BIGNUM * H_ns( SRP_HashAlgorithm alg, const BIGNUM * n, const unsigned ch
     return BN_bin2bn(buff, hash_length(alg), NULL);
 }
     
-static BIGNUM * calculate_x( SRP_HashAlgorithm alg, const BIGNUM * salt, const char * username, const char * password, int password_len )
+static BIGNUM * calculate_x( SRP_HashAlgorithm alg, const BIGNUM * salt, const char * username, const unsigned char * password, int password_len )
 {
     unsigned char ucp_hash[SHA256_DIGEST_LENGTH];
     HashCTX       ctx;
@@ -915,3 +915,51 @@ void srp_user_verify_session( SRPUser * usr, const unsigned char * bytes_HAMK )
     if ( memcmp( usr->H_AMK, bytes_HAMK, hash_length(usr->hash_alg) ) == 0 )
         usr->authenticated = 1;
 }
+
+void srp_create_salted_verification_key( SRP_HashAlgorithm alg, 
+                                         SRP_NGType ng_type, const char * username,
+                                         const unsigned char * password, int len_password,
+                                         const unsigned char ** bytes_s, int * len_s, 
+                                         const unsigned char ** bytes_v, int * len_v,
+                                         const char * n_hex, const char * g_hex )
+{
+    BIGNUM     * s   = BN_new();
+    BIGNUM     * v   = BN_new();
+    BIGNUM     * x   = 0;
+    BN_CTX     * ctx = BN_CTX_new();
+    NGConstant * ng  = new_ng( ng_type, n_hex, g_hex );
+
+    if( !s || !v || !ctx || !ng )
+       goto cleanup_and_exit;
+
+    init_random(); /* Only happens once */
+    
+    BN_rand(s, 32, -1, 0);
+    
+    x = calculate_x( alg, s, username, password, len_password );
+
+    if( !x )
+       goto cleanup_and_exit;
+
+    BN_mod_exp(v, ng->g, x, ng->N, ctx);
+        
+    *len_s   = BN_num_bytes(s);
+    *len_v   = BN_num_bytes(v);
+    
+    *bytes_s = (const unsigned char *) malloc( *len_s );
+    *bytes_v = (const unsigned char *) malloc( *len_v );
+
+    if (!bytes_s || !bytes_v)
+       goto cleanup_and_exit;
+    
+    BN_bn2bin(s, (unsigned char *) *bytes_s);
+    BN_bn2bin(v, (unsigned char *) *bytes_v);
+    
+ cleanup_and_exit:
+    delete_ng( ng );
+    BN_free(s);
+    BN_free(v);
+    BN_free(x);
+    BN_CTX_free(ctx);
+}
+
