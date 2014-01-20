@@ -126,9 +126,12 @@ static BOOL userIsLoggingIn = NO;
 	
 	const unsigned char *bytes_s, *bytes_v;
 	int len_s, len_v;
-	srp_create_salted_verification_key(SRP_SHA256, SRP_NG_1024, [username UTF8String], pass.bytes, pass.length, &bytes_s, &len_s, &bytes_v, &len_v, NULL, NULL);
 	NSString *identity = [[NSUUID UUID] UUIDString];
-	NSString *salt = [[NSData dataWithBytesNoCopy:(void*)bytes_s length:len_s freeWhenDone:YES] ddp_toHex];
+	NSString *salt = [[[NSUUID UUID] UUIDString] componentsSeparatedByString:@"-"][0];
+	bytes_s = (void*)[salt UTF8String];
+	len_s = strlen([salt UTF8String]);
+	
+	srp_create_salted_verification_key(SRP_SHA256, SRP_NG_1024, [identity UTF8String], pass.bytes, pass.length, &bytes_s, &len_s, &bytes_v, &len_v, NULL, NULL, true);
 	NSString *verifier = [[NSData dataWithBytesNoCopy:(void*)bytes_v length:len_v freeWhenDone:YES] ddp_toHex];
 	
 	[self sendWithMethodName:@"createUser" parameters:@[@{
