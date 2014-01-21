@@ -119,6 +119,26 @@ static BOOL userIsLoggingIn = NO;
     [self sendWithMethodName:@"logout" parameters:nil];
 }
 
+static NSString *randomId(int length)
+{
+	// Like Random.id in meteor: [a-zA-Z0-9]
+	static NSArray *characters;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		characters = [NSMutableArray new];
+		for(char c = 'A'; c < 'Z'; c++)
+			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSASCIIStringEncoding]];
+		for(char c = 'a'; c < 'z'; c++)
+			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSASCIIStringEncoding]];
+		for(char c = '0'; c < '9'; c++)
+			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSASCIIStringEncoding]];
+	});
+	NSMutableString *salt = [NSMutableString new];
+	for(int i = 0; i < length; i++)
+		[salt appendString:characters[arc4random_uniform(characters.count)]];
+	return salt;
+}
+
 - (void)signupWithUsername:(NSString *)username password:(NSString *)password fullname:(NSString*)fullname
 {
 	userIsLoggingIn = YES;
@@ -126,8 +146,8 @@ static BOOL userIsLoggingIn = NO;
 	
 	const unsigned char *bytes_s, *bytes_v;
 	int len_s, len_v;
-	NSString *identity = [[NSUUID UUID] UUIDString];
-	NSString *salt = [[[NSUUID UUID] UUIDString] componentsSeparatedByString:@"-"][0];
+	NSString *identity = randomId(16);
+	NSString *salt = randomId(16);
 	bytes_s = (void*)[salt UTF8String];
 	len_s = strlen([salt UTF8String]);
 	
