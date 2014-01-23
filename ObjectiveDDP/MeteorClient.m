@@ -127,11 +127,11 @@ static NSString *randomId(int length)
 	dispatch_once(&onceToken, ^{
 		characters = [NSMutableArray new];
 		for(char c = 'A'; c < 'Z'; c++)
-			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSASCIIStringEncoding]];
+			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSUTF8StringEncoding]];
 		for(char c = 'a'; c < 'z'; c++)
-			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSASCIIStringEncoding]];
+			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSUTF8StringEncoding]];
 		for(char c = '0'; c < '9'; c++)
-			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSASCIIStringEncoding]];
+			[(NSMutableArray*)characters addObject:[[NSString alloc] initWithBytes:&c length:1 encoding:NSUTF8StringEncoding]];
 	});
 	NSMutableString *salt = [NSMutableString new];
 	for(int i = 0; i < length; i++)
@@ -392,31 +392,31 @@ static SRPUser *srpUser;
 - (NSString *)generateAuthVerificationKeyWithUsername:(NSString *)username password:(NSString *)password {
     self.userName = username;
     self.password = password;
-    const char *username_str = [username cStringUsingEncoding:NSASCIIStringEncoding];
-    const char *password_str = [password cStringUsingEncoding:NSASCIIStringEncoding];
+    const char *username_str = [username cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *password_str = [password cStringUsingEncoding:NSUTF8StringEncoding];
     srpUser = srp_user_new(SRP_SHA256, SRP_NG_1024, username_str, password_str, NULL, NULL);
     srp_user_start_authentication(srpUser);
-    return [NSString stringWithCString:srpUser->Astr encoding:NSASCIIStringEncoding];
+    return [NSString stringWithCString:srpUser->Astr encoding:NSUTF8StringEncoding];
 }
 
 - (void)didReceiveLoginChallengeWithResponse:(NSDictionary *)response {
     NSString *B_string = response[@"B"];
-    const char *B = [B_string cStringUsingEncoding:NSASCIIStringEncoding];
+    const char *B = [B_string cStringUsingEncoding:NSUTF8StringEncoding];
     NSString *salt_string = response[@"salt"];
-    const char *salt = [salt_string cStringUsingEncoding:NSASCIIStringEncoding];
+    const char *salt = [salt_string cStringUsingEncoding:NSUTF8StringEncoding];
     NSString *identity_string = response[@"identity"];
-    const char *identity = [identity_string cStringUsingEncoding:NSASCIIStringEncoding];
-    const char *password_str = [self.password cStringUsingEncoding:NSASCIIStringEncoding];
+    const char *identity = [identity_string cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *password_str = [self.password cStringUsingEncoding:NSUTF8StringEncoding];
     const char *Mstr;
     srp_user_process_meteor_challenge(srpUser, password_str, salt, identity, B, &Mstr);
-    NSString *M_final = [NSString stringWithCString:Mstr encoding:NSASCIIStringEncoding];
+    NSString *M_final = [NSString stringWithCString:Mstr encoding:NSUTF8StringEncoding];
     NSArray *params = @[@{@"srp":@{@"M":M_final}}];
     [self sendWithMethodName:@"login" parameters:params];
 }
 
 - (void)didReceiveHAMKVerificationWithResponse:(NSDictionary *)response {
     userIsLoggingIn = NO;
-    srp_user_verify_meteor_session(srpUser, [response[@"HAMK"] cStringUsingEncoding:NSASCIIStringEncoding]);
+    srp_user_verify_meteor_session(srpUser, [response[@"HAMK"] cStringUsingEncoding:NSUTF8StringEncoding]);
     if (srp_user_is_authenticated) {
         self.sessionToken = response[@"token"];
         self.userId = response[@"id"];
