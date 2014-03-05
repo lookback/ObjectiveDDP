@@ -327,6 +327,10 @@ static int LOGON_RETRY_MAX = 5;
     }
     [_responseCallbacks removeAllObjects];
     [self.methodIds removeAllObjects];
+    if(userIsLoggingIn) {
+        [self.authDelegate authenticationFailed:@"Disconnected"];
+        userIsLoggingIn = NO;
+    }
 }
 
 #pragma mark Meteor Data Managment
