@@ -616,6 +616,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5286FA1887BC49AFB425645B /* Pods.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				DSTROOT = /tmp/ObjectiveDDP.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ObjectiveDDP/ObjectiveDDP-Prefix.pch";
@@ -636,6 +637,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5286FA1887BC49AFB425645B /* Pods.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				DSTROOT = /tmp/ObjectiveDDP.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ObjectiveDDP/ObjectiveDDP-Prefix.pch";
