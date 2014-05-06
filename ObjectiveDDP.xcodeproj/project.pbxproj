@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		05BCAAEB1919878C00FC0B63 /* srp.c in Sources */ = {isa = PBXBuildFile; fileRef = 405FD5F61746BCD5001F8AE7 /* srp.c */; };
+		05C0C13F1919A00600E654BC /* NSData+DDPHex.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C0C13E1919A00600E654BC /* NSData+DDPHex.m */; };
 		4000D63A170E880400296229 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4000D639170E880400296229 /* Foundation.framework */; };
 		4000D63F170E880400296229 /* ObjectiveDDP.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4000D63E170E880400296229 /* ObjectiveDDP.h */; };
 		4000D641170E880400296229 /* ObjectiveDDP.m in Sources */ = {isa = PBXBuildFile; fileRef = 4000D640170E880400296229 /* ObjectiveDDP.m */; };
@@ -58,6 +59,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		05C0C13D1919A00600E654BC /* NSData+DDPHex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+DDPHex.h"; sourceTree = "<group>"; };
+		05C0C13E1919A00600E654BC /* NSData+DDPHex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+DDPHex.m"; sourceTree = "<group>"; };
 		2459525257B94E909C3CA1DF /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		2C1F0C9084EA4B2DBD349673 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4000D636170E880400296229 /* libObjectiveDDP.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libObjectiveDDP.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -257,6 +260,8 @@
 				888B6DFB173B6508001EED80 /* MeteorClient.m */,
 				4000D63E170E880400296229 /* ObjectiveDDP.h */,
 				4000D640170E880400296229 /* ObjectiveDDP.m */,
+				05C0C13D1919A00600E654BC /* NSData+DDPHex.h */,
+				05C0C13E1919A00600E654BC /* NSData+DDPHex.m */,
 				405FD5F51746BCD5001F8AE7 /* srp */,
 				405FD5A81745DABE001F8AE7 /* openssl */,
 				4000D63C170E880400296229 /* Supporting Files */,
@@ -518,6 +523,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4000D641170E880400296229 /* ObjectiveDDP.m in Sources */,
+				05C0C13F1919A00600E654BC /* NSData+DDPHex.m in Sources */,
 				888B6DFC173B6508001EED80 /* MeteorClient.m in Sources */,
 				888B6DFF173B66EA001EED80 /* BSONIdGenerator.m in Sources */,
 				05BCAAEB1919878C00FC0B63 /* srp.c in Sources */,
