@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05BCAAEB1919878C00FC0B63 /* srp.c in Sources */ = {isa = PBXBuildFile; fileRef = 405FD5F61746BCD5001F8AE7 /* srp.c */; };
 		4000D63A170E880400296229 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4000D639170E880400296229 /* Foundation.framework */; };
 		4000D63F170E880400296229 /* ObjectiveDDP.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4000D63E170E880400296229 /* ObjectiveDDP.h */; };
 		4000D641170E880400296229 /* ObjectiveDDP.m in Sources */ = {isa = PBXBuildFile; fileRef = 4000D640170E880400296229 /* ObjectiveDDP.m */; };
@@ -519,6 +520,7 @@
 				4000D641170E880400296229 /* ObjectiveDDP.m in Sources */,
 				888B6DFC173B6508001EED80 /* MeteorClient.m in Sources */,
 				888B6DFF173B66EA001EED80 /* BSONIdGenerator.m in Sources */,
+				05BCAAEB1919878C00FC0B63 /* srp.c in Sources */,
 				4011C80417BD2AA6002AA28E /* DependencyProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
