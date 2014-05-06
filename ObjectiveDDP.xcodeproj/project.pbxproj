@@ -15,7 +15,6 @@
 		4011C80817BD2C06002AA28E /* FakeDependencyProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4011C80717BD2C06002AA28E /* FakeDependencyProvider.m */; };
 		4011C80B17BD2CA1002AA28E /* DDPSpecHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4011C80A17BD2CA1002AA28E /* DDPSpecHelper.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		4011C80E17BD2E14002AA28E /* DependencyProvider+Spec.m in Sources */ = {isa = PBXBuildFile; fileRef = 4011C80D17BD2E14002AA28E /* DependencyProvider+Spec.m */; };
-		401AEB7E170E9EC7008B38EA /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 401AEB7D170E9EC7008B38EA /* libicucore.dylib */; };
 		401AEB80170E9ECC008B38EA /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 401AEB7F170E9ECC008B38EA /* SystemConfiguration.framework */; };
 		401AEB82170E9ED2008B38EA /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 401AEB81170E9ED2008B38EA /* CFNetwork.framework */; };
 		401AEB84170E9EEB008B38EA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 401AEB83170E9EEB008B38EA /* Security.framework */; };
@@ -42,7 +41,6 @@
 		570DE62F4BD74C18AE51ED8C /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C1F0C9084EA4B2DBD349673 /* libPods.a */; };
 		888B6DFC173B6508001EED80 /* MeteorClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 888B6DFB173B6508001EED80 /* MeteorClient.m */; };
 		888B6DFF173B66EA001EED80 /* BSONIdGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 888B6DFE173B66EA001EED80 /* BSONIdGenerator.m */; };
-		9D3C062D54114FB1AC5700F0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BE0B3F1B814D98AAAE26CF /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -59,7 +57,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		22BE0B3F1B814D98AAAE26CF /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2459525257B94E909C3CA1DF /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		2C1F0C9084EA4B2DBD349673 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4000D636170E880400296229 /* libObjectiveDDP.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libObjectiveDDP.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -188,8 +185,6 @@
 				401AEB82170E9ED2008B38EA /* CFNetwork.framework in Frameworks */,
 				401AEB80170E9ECC008B38EA /* SystemConfiguration.framework in Frameworks */,
 				4000D63A170E880400296229 /* Foundation.framework in Frameworks */,
-				401AEB7E170E9EC7008B38EA /* libicucore.dylib in Frameworks */,
-				9D3C062D54114FB1AC5700F0 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -627,7 +622,7 @@
 					"$(inherited)",
 					"\\\"$(SDKROOT)/usr/lib/system\\\"",
 					"\\\"$(SRCROOT)/ObjectiveDDP\\\"",
-					/Users/boundsj/workspace/ios/ObjectiveDDP/ObjectiveDDP,
+					ObjectiveDDP,
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -647,7 +642,7 @@
 					"$(inherited)",
 					"\\\"$(SDKROOT)/usr/lib/system\\\"",
 					"\\\"$(SRCROOT)/ObjectiveDDP\\\"",
-					/Users/boundsj/workspace/ios/ObjectiveDDP/ObjectiveDDP,
+					ObjectiveDDP,
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
