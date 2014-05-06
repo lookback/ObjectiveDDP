@@ -968,8 +968,9 @@ void srp_create_salted_verification_key( SRP_HashAlgorithm alg,
     if( !x )
        goto cleanup_and_exit;
 
-    BN_mod_exp(v, ng->g, x, ng->N, ctx);
-        
+    if(!BN_mod_exp(v, ng->g, x, ng->N, ctx))
+        goto cleanup_and_exit;
+    
     *len_v   = BN_num_bytes(v);
 
     if (!bytes_s || !bytes_v)
