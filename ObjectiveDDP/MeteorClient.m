@@ -144,8 +144,8 @@ static NSString *randomId(int length)
 	userIsLoggingIn = YES;
 	NSData *pass = [password dataUsingEncoding:NSUTF8StringEncoding];
 	
-	const unsigned char *bytes_s, *bytes_v;
-	int len_s, len_v;
+	const unsigned char *bytes_s = NULL, *bytes_v = NULL;
+	int len_s = 0, len_v = 0;
 	NSString *identity = randomId(16);
 	NSString *salt = randomId(16);
 	bytes_s = (void*)[salt UTF8String];

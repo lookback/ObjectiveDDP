@@ -955,13 +955,12 @@ void srp_create_salted_verification_key( SRP_HashAlgorithm alg,
     
 	if(!use_given_salt) {
 		BN_rand(s, 32, -1, 0);
-		*bytes_s = (const unsigned char *) malloc( *len_s );
 		*len_s   = BN_num_bytes(s);
+		*bytes_s = (const unsigned char *) malloc( *len_s );
 	} else {
 		BN_bin2bn(*bytes_s, *len_s, s);
 	}
 	
-    *bytes_v = (const unsigned char *) malloc( *len_v );
     
     x = calculate_x( alg, s, username, password, len_password );
 
@@ -971,13 +970,15 @@ void srp_create_salted_verification_key( SRP_HashAlgorithm alg,
     if(!BN_mod_exp(v, ng->g, x, ng->N, ctx))
         goto cleanup_and_exit;
     
-    *len_v   = BN_num_bytes(v);
-
-    if (!bytes_s || !bytes_v)
-       goto cleanup_and_exit;
-    
-    BN_bn2bin(s, (unsigned char *) *bytes_s);
-    BN_bn2bin(v, (unsigned char *) *bytes_v);
+	if(!use_given_salt && bytes_s) {
+		BN_bn2bin(s, (unsigned char *) *bytes_s);
+	}
+	
+	if(len_v && bytes_v) {
+		*len_v   = BN_num_bytes(v);
+		*bytes_v = (const unsigned char *) malloc( *len_v );
+		BN_bn2bin(v, (unsigned char *) *bytes_v);
+	}
     
  cleanup_and_exit:
     delete_ng( ng );
