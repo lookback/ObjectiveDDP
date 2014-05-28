@@ -29,8 +29,8 @@
 //  support: array of strings (protocol versions supported by the client, in order of preference)
 - (void)connectWithSession:(NSString *)session
                    version:(NSString *)version
-                   support:(NSString *)support {
-    NSDictionary *fields = @{@"msg": @"connect", @"version": version};
+                   support:(NSArray *)support {
+    NSDictionary *fields = @{@"msg": @"connect", @"version": version, @"support": support};
     NSString *json = [self _buildJSONWithFields:fields parameters:nil];
 
     [self.webSocket send:json];

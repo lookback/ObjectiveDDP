@@ -16,7 +16,7 @@
 
 - (void)connectWithSession:(NSString *)session
                    version:(NSString *)version
-                   support:(NSString *)support;
+                   support:(NSArray *)support;
 
 - (void)subscribeWith:(NSString *)id
                  name:(NSString *)name

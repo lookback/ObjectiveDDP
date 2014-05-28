@@ -281,7 +281,7 @@ static int LOGON_RETRY_MAX = 5;
     self.websocketReady = YES;
     [self resetCollections];
     // TODO: pre1 should be a setting
-    [self.ddp connectWithSession:nil version:@"pre1" support:nil];
+    [self.ddp connectWithSession:nil version:@"pre1" support:@[@"pre1"]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:MeteorClientDidConnectNotification object:self];
 }
