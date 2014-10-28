@@ -157,8 +157,6 @@ double const MeteorClientMaxRetryIncrease = 6;
         responseCallback(response, error);
     }];
     
-    _logonParams = userParameters;
-    _logonMethodCallback = responseCallback;
 }
 
 - (void)signupWithUsernameAndEmail:(NSString *)username email:(NSString *)email password:(NSString *)password fullname:(NSString *)fullname responseCallback:(MeteorClientMethodCallback)responseCallback {
@@ -407,7 +405,6 @@ double const MeteorClientMaxRetryIncrease = 6;
 }
 
 - (void)_setAuthStatetoLoggedOut {
-    _logonParams = nil;
     self.authState = AuthStateLoggedOut;
     self.userId = nil;
 }
