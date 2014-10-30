@@ -151,8 +151,10 @@ double const MeteorClientMaxRetryIncrease = 6;
     [self callMethodName:@"login" parameters:@[mutableUserParameters] responseCallback:^(NSDictionary *response, NSError *error) {
         if (error) {
             [self _setAuthStatetoLoggedOut];
+			[self.authDelegate authenticationFailedWithError:error];
         } else {
             [self _setAuthStateToLoggedIn:response[@"result"][@"id"] withToken:response[@"result"][@"token"]];
+			[self.authDelegate authenticationWasSuccessful];
         }
         responseCallback(response, error);
     }];
@@ -175,6 +177,7 @@ double const MeteorClientMaxRetryIncrease = 6;
 	if (self.authState == AuthStateLoggingIn) {
         NSString *errorDesc = [NSString stringWithFormat:@"You must wait for the current signup request to finish before sending another."];
         NSError *logonError = [NSError errorWithDomain:MeteorClientTransportErrorDomain code:MeteorClientErrorLogonRejected userInfo:@{NSLocalizedDescriptionKey: errorDesc}];
+		[self.authDelegate authenticationFailedWithError:logonError];
         if (responseCallback) {
             responseCallback(nil, logonError);
         }
@@ -188,8 +191,10 @@ double const MeteorClientMaxRetryIncrease = 6;
     [self callMethodName:@"createUser" parameters:@[mutableUserParameters] responseCallback:^(NSDictionary *response, NSError *error) {
         if (error) {
             [self _setAuthStatetoLoggedOut];
+			[self.authDelegate authenticationFailedWithError:error];
         } else {
             [self _setAuthStateToLoggedIn:response[@"result"][@"id"] withToken:response[@"result"][@"token"]];
+			[self.authDelegate authenticationWasSuccessful];
         }
         responseCallback(response, error);
     }];
