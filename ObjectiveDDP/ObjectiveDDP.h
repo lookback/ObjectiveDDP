@@ -7,7 +7,7 @@
 @interface ObjectiveDDP : NSObject <SRWebSocketDelegate>
 
 @property (nonatomic, copy) NSString *urlString;
-@property (nonatomic, assign) id <ObjectiveDDPDelegate> delegate;
+@property (nonatomic, weak) id <ObjectiveDDPDelegate> delegate;
 @property (nonatomic, strong) SRWebSocket *webSocket;
 
 - (void)ping:(NSString *)id;

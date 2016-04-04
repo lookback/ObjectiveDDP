@@ -13,6 +13,11 @@
     return self;
 }
 
+- (void)dealloc
+{
+    self.webSocket.delegate = nil;
+}
+
 #pragma mark - Public API
 
 // connect to the underlying websocket
@@ -105,6 +110,7 @@
 
 - (void)_closeConnection {
     [self.webSocket close];
+    self.webSocket.delegate = nil;
     self.webSocket = nil;
 }
 
