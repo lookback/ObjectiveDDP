@@ -11,7 +11,7 @@ extern NSString * const MeteorClientDidDisconnectNotification;
 extern NSString * const MeteorClientTransportErrorDomain;
 
 // xxx:
-NS_ENUM(NSUInteger, MeteorClientError) {
+typedef NS_ENUM(NSUInteger, MeteorClientError) {
     MeteorClientErrorNotConnected,
     MeteorClientErrorDisconnectedBeforeCallbackComplete,
     MeteorClientErrorLogonRejected
@@ -45,18 +45,25 @@ typedef void(^MeteorClientMethodCallback)(NSDictionary *response, NSError *error
 //          use "1" for meteor versions v0.8.9 and above
 - (id)initWithDDPVersion:(NSString *)ddpVersion;
 
+// Prevent user from start with this methods
+- (id)init __attribute__((unavailable("Must use initWithDDPVersion: instead.")));
++ (instancetype)new __attribute__((unavailable("Must use initWithDDPVersion: instead.")));
+
 #pragma mark - Methods
 
-- (void) logonWithSessionToken:(NSString *) sessionToken;
-- (NSString *)callMethodName:(NSString *)methodName parameters:(NSArray *)parameters responseCallback:(MeteorClientMethodCallback)asyncCallback;
+- (void) logonWithSessionToken:(NSString *) sessionToken responseCallback:(MeteorClientMethodCallback)responseCallback;
+- (NSString *)callMethodName:(NSString *)methodName parameters:(NSArray *)parameters responseCallback:(MeteorClientMethodCallback)responseCallback;
 - (void)logonWithUsername:(NSString *)username password:(NSString *)password responseCallback:(MeteorClientMethodCallback)responseCallback;
 - (void)logonWithEmail:(NSString *)email password:(NSString *)password responseCallback:(MeteorClientMethodCallback)responseCallback;
 - (void)logonWithUsernameOrEmail:(NSString *)usernameOrEmail password:(NSString *)password responseCallback:(MeteorClientMethodCallback)responseCallback;
+- (void)logonWithOAuthAccessToken: (NSString *)accessToken serviceName: (NSString *) serviceName responseCallback: (MeteorClientMethodCallback)responseCallback;
+- (void)logonWithOAuthAccessToken:(NSString *)accessToken serviceName:(NSString *)serviceName optionsKey:(NSString *)key responseCallback:(MeteorClientMethodCallback)responseCallback;
 - (void)logonWithUserParameters:(NSDictionary *)userParameters responseCallback:(MeteorClientMethodCallback)responseCallback;
 
 - (void)signupWithUsernameAndEmail:(NSString *)username email:(NSString *)email password:(NSString *)password fullname:(NSString *)fullname responseCallback:(MeteorClientMethodCallback)responseCallback;
 - (void)signupWithUsername:(NSString *)username password:(NSString *)password fullname:(NSString *)fullname responseCallback:(MeteorClientMethodCallback)responseCallback;
 - (void)signupWithEmail:(NSString *)email password:(NSString *)password fullname:(NSString *)fullname responseCallback:(MeteorClientMethodCallback)responseCallback;
+- (void)signupWithEmail:(NSString *)email password:(NSString *)password firstName:(NSString *)firstName lastName:(NSString *)lastName responseCallback:(MeteorClientMethodCallback)responseCallback;
 - (void)signupWithUserParameters:userParameters responseCallback:(MeteorClientMethodCallback) responseCallback;
 - (void)addSubscription:(NSString *)subscriptionName;
 - (void)addSubscription:(NSString *)subscriptionName withParameters:(NSArray *)parameters;

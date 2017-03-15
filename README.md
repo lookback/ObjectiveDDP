@@ -1,18 +1,34 @@
 ObjectiveDDP
 ============
 
+[![Join the chat at https://gitter.im/boundsj/ObjectiveDDP](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/boundsj/ObjectiveDDP?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/boundsj/ObjectiveDDP.png)](https://travis-ci.org/boundsj/ObjectiveDDP)
+
+Connect your iOS/OSX applications written in Objective-C or Swift to server applications that communicate with the [DDP protocol created by Meteor](https://github.com/meteor/meteor/blob/devel/packages/ddp/DDP.md) and, if required by your server, authenticate with it.
 
 ```
 Note:
-Recent changes to meteor (https://github.com/meteor/meteor/blob/release/0.8.2/History.md) 
-have fundamentally changed the way authorization works. Because of this, the current 
-version of the master branch of this project (and all future releases) will only be 
-compatible with meteor 0.8.2 and above. Please update your meteor server 
-as soon as possible.
+supports meteor 0.8.2 and above.
+If you need to migrate please see the srp-upgrade-support branch
 ```
 
-Connect your iOS applications written in Objective-C to server applications that communicate with the [DDP protocol created by Meteor](https://github.com/meteor/meteor/blob/devel/packages/ddp/DDP.md) and, if required by your server, authenticate with it.
+###### Now with support for OAuth with Facebook and other services [experiemental]
+
+This is unsupported so don't come crying if it eats your cat! or destroys any data.
+
+```
+(void)logonWithOAuthAccessToken: (NSString *)accessToken serviceName: (NSString *) serviceName responseCallback: (MeteorClientMethodCallback)responseCallback;
+```
+
+Please require the following project to your meteor server for this to work.
+```
+https://github.com/jasper-lu/facebook-ddp
+```
+
+Hopefully meteor will support this natively in the future https://github.com/meteor/meteor/pull/3515
+
+
 
 What's Inside
 -------------
@@ -22,7 +38,7 @@ ObjectiveDDP should run well with iOS projects using ARC and iOS 7.1 or above. _
 ##### Integrate it with your project using CocoaPods:
 
 ```
-pod 'ObjectiveDDP', '~> 0.1.8'
+pod 'ObjectiveDDP', '~> 0.2.0'
 ```
 For more information about this, check out [Linking and Building](https://github.com/boundsj/ObjectiveDDP/wiki/Linking-and-using-ObjectiveDDP) in the wiki.
 
@@ -163,7 +179,7 @@ NSArray *parameters = @[@{@"_id": anId,
 
 ##### Listen for notifications:
 
-MeteorClientConnectionReadyNotification - When the server responds as accepting the DDP protocal version to communicate on, you won't be able to call any methods to meteor until this happens
+MeteorClientConnectionReadyNotification - When the server responds as accepting the DDP protocol version to communicate on, you won't be able to call any methods to meteor until this happens
 
 ```objective-c
 

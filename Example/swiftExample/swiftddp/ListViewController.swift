@@ -10,37 +10,40 @@ import Foundation
 import UIKit
 
 class ListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-
+    
     @IBOutlet weak var tableview: UITableView!
     var meteor:MeteorClient!
-    var lists:NSMutableArray!
-    var userId:NSString?
+    var lists:M13MutableOrderedDictionary!
+    var userId:String?
     
-    required init(coder aDecoder: NSCoder!) {
+    required init(coder aDecoder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
     init(nibName nibNameOrNil: String!, bundle nibBundleOrNil: NSBundle!, meteor: MeteorClient!) {
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        if(self != nil) {
-            self.meteor = meteor
-            self.lists = self.meteor.collections["lists"] as NSMutableArray
-        }
+        self.meteor = meteor
+        self.lists = self.meteor.collections["lists"] as M13MutableOrderedDictionary
+        
     }
-
+    
+    
+    
     
     override func viewWillAppear(animated: Bool) {
+        self.meteor.addObserver(self, forKeyPath: "websocketReady", options: NSKeyValueObservingOptions.New, context: nil)
         self.navigationItem.title = "My Lists"
-        self.navigationController.navigationBarHidden = false
+        self.navigationController?.navigationBarHidden = false
         self.navigationItem.hidesBackButton = true
         
         var logoutButton:UIBarButtonItem = UIBarButtonItem(title: "Logout", style: UIBarButtonItemStyle.Plain, target: self, action: "logout")
         
         self.navigationItem.rightBarButtonItem = logoutButton
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "didReceiveUpdate:", name: "added", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "didReceiveUpdate:", name: "removed", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "didReceiveUpdate:", name: "lists_added", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "didReceiveUpdate:", name: "lists_removed", object: nil)
+        
         
     }
     
@@ -50,17 +53,29 @@ class ListViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     func logout() {
         self.meteor.logout()
-        self.navigationController.popToRootViewControllerAnimated(true)
+        self.navigationController?.popToRootViewControllerAnimated(true)
     }
     
-    func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
-        return self.lists.count
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return Int(self.lists.count())
     }
     
-    var selectedList:NSDictionary!
+    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafeMutablePointer<()>) {
+        
+        if (keyPath == "websocketReady" && meteor.websocketReady) {
+            
+        }
+    }
     
-    func tableView(tableView: UITableView!, cellForRowAtIndexPath indexPath: NSIndexPath!) -> UITableViewCell! {
-        var cellIdentifier:NSString = "list"
+    
+    
+    var selectedList:[String:String]!
+    
+    
+    
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        var cellIdentifier = "list"
         var cell:UITableViewCell
         
         if var tmpCell: AnyObject = tableView.dequeueReusableCellWithIdentifier(cellIdentifier) {
@@ -69,12 +84,9 @@ class ListViewController: UIViewController, UITableViewDataSource, UITableViewDe
             cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: cellIdentifier) as UITableViewCell
         }
         
-//         = tableView.dequeueReusableCellWithIdentifier(cellIdentifier) as UITableViewCell
         
-        
-        var list:NSDictionary = self.lists[indexPath.row] as NSDictionary
-        selectedList = list
-        cell.textLabel.text = list["name"] as NSString
+        selectedList  = self.lists.objectAtIndex(UInt(indexPath.row)) as? [String:String]
+        cell.textLabel?.text = selectedList["name"]
         
         var shareButton:UIButton = UIButton.buttonWithType(UIButtonType.Custom) as UIButton
         
@@ -92,7 +104,7 @@ class ListViewController: UIViewController, UITableViewDataSource, UITableViewDe
     var shareWithTF:UITextField!
     
     func didClickShareButton(sender:AnyObject!,forEvent event:UIEvent!) {
-        var touch:UITouch = event.allTouches().anyObject() as UITouch
+        var touch:UITouch = event.allTouches()!.anyObject() as UITouch
         var location:CGPoint = touch.locationInView(self.view)
         
         var view:UIView = UIView(frame: CGRectMake(0.0, location.y, 320.0, 100.0))
@@ -118,8 +130,9 @@ class ListViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     func didClickShareWithButton(sender: AnyObject!) {
-        var parameters:NSArray = [["_id":selectedList["_id"]], ["set": ["share_with":shareWithTF.text]]]
-        self.meteor .callMethodName("/lists/update", parameters: parameters, responseCallback: nil)
+        var id = selectedList["_id"] as String!
+        var parameters = [["_id":id], ["set": ["share_with":shareWithTF.text]]] //This has to be an NSArray
+        self.meteor.callMethodName("/lists/update", parameters: parameters)
         self.view.subviews.last?.removeFromSuperview()
         self.view.subviews.last?.removeFromSuperview()
         
@@ -130,31 +143,20 @@ class ListViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     func tableView(tableView: UITableView!, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath!) {
-        var list:NSDictionary = self.lists[indexPath.row] as NSDictionary
-        self.meteor.callMethodName("/lists/remove", parameters: [["_id":list["_id"]]], responseCallback: nil)
+        var list = self.lists.objectAtIndex(UInt(indexPath.row)) as [String:AnyObject]
+        var id = list["_id"] as String
+        self.meteor.callMethodName("/lists/remove", parameters: [["_id":id]])
     }
     
     func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
-        var list:NSDictionary = self.lists[indexPath.row] as NSDictionary
-        var viewController:ViewController = ViewController(nibNameOrNil: "ViewController", bundle: nil, meteor: self.meteor, listName: list["name"] as NSString)
+        var list = self.lists.objectAtIndex(UInt(indexPath.row)) as [String:AnyObject]
+        var viewController:ViewController = ViewController(nibNameOrNil: "ViewController", bundle: nil, meteor: self.meteor, listName: list["name"] as String)
         
         viewController.userId = self.userId
-        self.navigationController.pushViewController(viewController, animated: true)
-    }
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        self.navigationController?.pushViewController(viewController, animated: true)
     }
     
     
     
-
+    
 }
